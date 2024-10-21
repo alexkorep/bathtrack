@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Calendar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .calendar {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            max-width: 100%;
+            width: 300px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 50%;
+            font-size: 14px;
+        }
+        .day:hover {
+            background-color: #f0f0f0;
+        }
+        .current {
+            border: 2px solid #007bff;
+        }
+        .green {
+            background-color: #28a745;
+            color: white;
+        }
+        .red {
+            background-color: #dc3545;
+            color: white;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar">
+        <div class="header">
+            <h2 id="monthYear"></h2>
+        </div>
+        <div class="days" id="calendar"></div>
+        <div class="controls">
+            <button id="prevMonth">Previous Month</button>
+            <button id="nextMonth">Next Month</button>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+
+        const monthYearElement = document.getElementById('monthYear');
+        const calendarElement = document.getElementById('calendar');
+        const prevMonthButton = document.getElementById('prevMonth');
+        const nextMonthButton = document.getElementById('nextMonth');
+
+        function updateCalendar() {
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+
+            monthYearElement.textContent = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' });
+
+            calendarElement.innerHTML = '';
+
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                calendarElement.innerHTML += '<div></div>';
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('day');
+                dayElement.textContent = day;
+
+                if (day === currentDate.getDate() && currentMonth === currentDate.getMonth() && currentYear === currentDate.getFullYear()) {
+                    dayElement.classList.add('current');
+                }
+
+                const storedState = localStorage.getItem(`${currentYear}-${currentMonth}-${day}`);
+                if (storedState) {
+                    dayElement.classList.add(storedState);
+                }
+
+                dayElement.addEventListener('click', () => {
+                    if (dayElement.classList.contains('green')) {
+                        dayElement.classList.remove('green');
+                        dayElement.classList.add('red');
+                        localStorage.setItem(`${currentYear}-${currentMonth}-${day}`, 'red');
+                    } else if (dayElement.classList.contains('red')) {
+                        dayElement.classList.remove('red');
+                        localStorage.removeItem(`${currentYear}-${currentMonth}-${day}`);
+                    } else {
+                        dayElement.classList.add('green');
+                        localStorage.setItem(`${currentYear}-${currentMonth}-${day}`, 'green');
+                    }
+                });
+
+                calendarElement.appendChild(dayElement);
+            }
+        }
+
+        prevMonthButton.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            updateCalendar();
+        });
+
+        nextMonthButton.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            updateCalendar();
+        });
+
+        updateCalendar();
+    </script>
+</body>
+</html>
