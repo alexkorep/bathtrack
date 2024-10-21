@@ -28,19 +28,25 @@
             align-items: center;
             margin-bottom: 10px;
         }
-        .days {
+        .days, .weekdays {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 5px;
         }
-        .day {
+        .weekdays {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .weekday, .day {
             aspect-ratio: 1;
             display: flex;
             justify-content: center;
             align-items: center;
+            font-size: 14px;
+        }
+        .day {
             cursor: pointer;
             border-radius: 50%;
-            font-size: 14px;
         }
         .day:hover {
             background-color: #f0f0f0;
@@ -79,6 +85,7 @@
         <div class="header">
             <h2 id="monthYear"></h2>
         </div>
+        <div class="weekdays" id="weekdays"></div>
         <div class="days" id="calendar"></div>
         <div class="controls">
             <button id="prevMonth">Previous Month</button>
@@ -92,15 +99,26 @@
         let currentYear = currentDate.getFullYear();
 
         const monthYearElement = document.getElementById('monthYear');
+        const weekdaysElement = document.getElementById('weekdays');
         const calendarElement = document.getElementById('calendar');
         const prevMonthButton = document.getElementById('prevMonth');
         const nextMonthButton = document.getElementById('nextMonth');
+
+        const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
         function updateCalendar() {
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
 
             monthYearElement.textContent = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' });
+
+            weekdaysElement.innerHTML = '';
+            weekdays.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('weekday');
+                dayElement.textContent = day;
+                weekdaysElement.appendChild(dayElement);
+            });
 
             calendarElement.innerHTML = '';
 
